@@ -15,6 +15,7 @@
             </div>
             <div>
                 @if (Auth::id() == $task->user_id)
+                    {!! link_to_route('tasks.edit', 'Edit', ['id'=>$task->id], ['class'=> 'btn btn-default']) !!}
                     {!! Form::open(['route'=>['tasks.destroy', $task->id], 'method'=>'delete']) !!}
                         {!! Form::submit('Delete', ['class'=> 'btn btn-danger btn-xs']) !!}
                     {!! Form::close() !!}

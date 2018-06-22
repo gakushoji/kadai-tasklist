@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 
+use App\Task;
+use App\User;
+
 class TasksController extends Controller
 {
     /**
@@ -18,17 +21,10 @@ class TasksController extends Controller
         $data = [];
         if (\Auth::check()) {
             $user = \Auth::user();
-            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
-
-            $data = [
-                'user' => $user,
-                'tasks' => $tasks,
-            ];
-            $data += $this->counts($user);
-            return view('users.show', $data);
+            return redirect()->route('users.show', ['id'=>$user->id]);
         }else {
             return view('welcome');
-        }
+              }
     }
 
     /**
@@ -89,7 +85,7 @@ class TasksController extends Controller
      */
     public function edit($id)
     {
-        $task = Task::find($id);
+        $task = \App\Task::find($id);
 
         return view('tasks.edit', [
             'task' => $task,
@@ -110,20 +106,19 @@ class TasksController extends Controller
             'content' => 'required|max:191',
             ]);
         
-        $task = Task::find($id);
+        $task = \App\Task::find($id);
+        if (\Auth::id() === $task->user_id) {
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
-
+        
+        return redirect()->route('users.show',['id'=>$task->user_id]);
+        
+        }else {
         return redirect('/');
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $task = \App\Task::find($id);
